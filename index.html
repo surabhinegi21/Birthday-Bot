@@ -984,7 +984,7 @@ const bdayToday = team.filter(m => m.isToday);
 // For the centre star: today's birthday person, else whoever is next soonest
 // Use a COPY for sorting so original team array order (and colorIdx) stays intact
 const sortedByNext = [...team].sort((a, b) => a.daysUntil - b.daysUntil);
-const bdayStar     = bdayToday.length > 0 ? bdayToday[0] : sortedByNext[0];
+const bdayStars = bdayToday.length > 0 ? bdayToday : [sortedByNext[0]];
 
 // Next birthday person (not the star)
 const nextBday = sortedByNext.find(m => !m.isToday && m.name !== bdayStar.name) || sortedByNext[1];
@@ -1024,20 +1024,27 @@ function renderOrbit() {
   const centerEl = document.createElement('div');
   centerEl.className = 'center-card';
   centerEl.onclick = () => openMember(team.findIndex(m=>m.name===bdayStar.name));
-
-  const starMember = team.find(m=>m.name===bdayStar.name);
+  const starMembers = bdayStars;
+  //const starMember = team.find(m=>m.name===bdayStar.name);
   const starC = COLORS[starMember.colorIdx];
 
-  centerEl.innerHTML = `
-    <div class="center-avatar-wrap">
-      <span class="crown">👑</span>
-      <div class="center-avatar" style="background:${starC.light};color:${starC.main};border-color:${starC.main};">
-        ${starMember.photo ? `<img src="${starMember.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>` : initials(starMember.name)}
-      </div>
-    </div>
-    <div class="center-name">${starMember.name}</div>
-    <div class="center-role">${starMember.role}</div>
-    <div class="bday-badge">${starMember.isToday ? '🎂 Birthday Today' : '⭐ Birthday Star'}</div>
+ centerEl.innerHTML = `
+  <div class="center-avatar-wrap" style="display:flex; gap:10px; justify-content:center;">
+    ${starMembers.map(m => {
+      const c = COLORS[m.colorIdx];
+      return `
+        <div style="text-align:center;">
+          <div class="center-avatar" style="background:${c.light};color:${c.main};border-color:${c.main};">
+            ${m.photo 
+              ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>` 
+              : initials(m.name)}
+          </div>
+          <div style="font-size:12px;margin-top:6px;">${toFirstName(m.name)}</div>
+        </div>
+      `;
+    }).join('')}
+  </div>
+  <div class="bday-badge">🎂 Birthday Squad</div>
   `;
   wrap.appendChild(centerEl);
 
