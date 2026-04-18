@@ -811,7 +811,6 @@
       <div id="view-panel">
         <div class="modal-name" id="modal-name"></div>
         <div class="modal-role" id="modal-role"></div>
-        <div class="modal-email" id="modal-email"></div>
         <div id="modal-bday-chip"></div>
         <div class="section-title">About</div>
         <div class="bio-text" id="modal-bio">No bio added yet.</div>
@@ -911,7 +910,7 @@ const COLORS = [
 // Load from localStorage or use defaults
 function defaultTeam() {
   return [
-    { bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Mood Lifter',       bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'ankit.parmar@adidas.com',    bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Mood Lifter',       bio:'', hobbies:[], likes:[], funfact:'', photo:null },
     { email:'arpita.doshatti@adidas.com', bday:{m:6, d:5},  name:'Arpita Doshatti', role:'Festive Soul',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
     { email:'ashish.kumar@adidas.com',    bday:{m:9, d:14}, name:'Ashish Kumar',    role:'The Charmer',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
     { email:'jose.leitao@adidas.com',     bday:{m:2, d:16}, name:'Jose Leitao',     role:'Deep Thinker',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
@@ -1138,7 +1137,6 @@ function openMember(idx) {
   // Info
   document.getElementById('modal-name').textContent = m.name;
   document.getElementById('modal-role').textContent = m.role;
-  document.getElementById('modal-email').textContent = m.email;
 
   // Birthday chip
   const chip = document.getElementById('modal-bday-chip');
