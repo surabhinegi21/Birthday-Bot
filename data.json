@@ -1,1 +1,130 @@
-[]
+[
+  {
+    "name": "Ankit Parmar",
+    "role": "Mood Lifter",
+    "bday": {
+      "m": 1,
+      "d": 17
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 0,
+    "isToday": false,
+    "daysUntil": 272
+  },
+  {
+    "name": "Arpita Doshatti",
+    "role": "Festive Soul",
+    "bday": {
+      "m": 6,
+      "d": 5
+    },
+    "bio": "Arpita is a people-loving soul who enjoys meaningful conversations, building connections, and spreading extra cheer during Christmas",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 1,
+    "isToday": false,
+    "daysUntil": 46
+  },
+  {
+    "name": "Ashish Kumar",
+    "role": "The Charmer",
+    "bday": {
+      "m": 9,
+      "d": 14
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 2,
+    "isToday": false,
+    "daysUntil": 147
+  },
+  {
+    "name": "Jose Leitao",
+    "role": "System Thinker",
+    "bday": {
+      "m": 2,
+      "d": 16
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 3,
+    "isToday": false,
+    "daysUntil": 302
+  },
+  {
+    "name": "Piyush Bansal",
+    "role": "Human Timeline",
+    "bday": {
+      "m": 6,
+      "d": 8
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 4,
+    "isToday": false,
+    "daysUntil": 49
+  },
+  {
+    "name": "Vera Oliveira",
+    "role": "Pure Heart",
+    "bday": {
+      "m": 7,
+      "d": 2
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 5,
+    "isToday": false,
+    "daysUntil": 73
+  },
+  {
+    "name": "Rahul Nagpal",
+    "role": "Generous Soul",
+    "bday": {
+      "m": 6,
+      "d": 8
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 6,
+    "isToday": false,
+    "daysUntil": 49
+  },
+  {
+    "name": "Surabhi Negi",
+    "role": "Lost Soul",
+    "bday": {
+      "m": 11,
+      "d": 21
+    },
+    "bio": "",
+    "hobbies": [],
+    "likes": [],
+    "funfact": "",
+    "photo": null,
+    "colorIdx": 7,
+    "isToday": false,
+    "daysUntil": 215
+  }
+]
