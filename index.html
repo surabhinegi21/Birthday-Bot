@@ -1243,7 +1243,7 @@ function handlePhotoUpload(e) {
   reader.readAsDataURL(file);
 }
 
-function saveProfile() {
+async function saveProfile() {
   const m = team[currentMemberIdx];
   m.role     = document.getElementById('edit-role').value.trim() || m.role;
   m.bio      = document.getElementById('edit-bio').value.trim();
@@ -1252,7 +1252,7 @@ function saveProfile() {
   m.likes    = [...editLikes];
   if (window._tempPhoto) { m.photo = window._tempPhoto; window._tempPhoto = null; }
 
-  saveTeam();
+  await saveTeam();
   renderOrbit();
 
   // Reload view
