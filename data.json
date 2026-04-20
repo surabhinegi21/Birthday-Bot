@@ -40,10 +40,12 @@
       "m": 9,
       "d": 14
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "A chill and supportive manager who loves building long-term relationships and keeping both teams and customers happy along the way.",
+    "hobbies": [
+      "Movies"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "Always ready to have fun",
     "photo": null,
     "colorIdx": 2,
     "isToday": false,
