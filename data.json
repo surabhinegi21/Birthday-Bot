@@ -58,10 +58,12 @@
       "m": 2,
       "d": 16
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "Jose is a board game and LEGO enthusiast whose mind works like a pro data architect.",
+    "hobbies": [
+      "Board Games"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "Loves minimalism. Connects pieces seamlessly to create smart, scalable solutions.",
     "photo": null,
     "colorIdx": 3,
     "isToday": false,
