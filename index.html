@@ -465,7 +465,7 @@
   }
 
   .modal-role { font-size: 13px; color: var(--muted); margin-top: 3px; }
-  .modal-email { font-size: 12px; color: var(--hint); margin-top: 2px; }
+
 
   .bday-chip {
     display: inline-flex;
@@ -811,6 +811,7 @@
       <div id="view-panel">
         <div class="modal-name" id="modal-name"></div>
         <div class="modal-role" id="modal-role"></div>
+
         <div id="modal-bday-chip"></div>
         <div class="section-title">About</div>
         <div class="bio-text" id="modal-bio">No bio added yet.</div>
@@ -907,125 +908,37 @@ const COLORS = [
   { main:'#185FA5', light:'#E6F1FB' },
 ];
 
-// ── GITHUB SYNC CONFIG ──────────────────────────────────────────────────────
-// Fill in your details below:
-const GH_TOKEN = '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';   // GitHub personal access token
-const GH_REPO  = 'surabhinegi21/Birthday-Bot'; // your GitHub repo
-const GH_FILE  = 'data.json';               // separate data file (not index.html)
-
-const DEFAULT_TEAM = [
-  { email:'ankit.parmar@adidas.com',    bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Mood Lifter',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'arpita.doshatti@adidas.com', bday:{m:6, d:5},  name:'Arpita Doshatti', role:'Festive Soul',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'ashish.kumar@adidas.com',    bday:{m:9, d:14}, name:'Ashish Kumar',    role:'The Charmer',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'jose.leitao@adidas.com',     bday:{m:2, d:16}, name:'Jose Leitao',     role:'System Thinker', bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'piyush.bansal@adidas.com',   bday:{m:6, d:8},  name:'Piyush Bansal',   role:'Human Timeline',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'vera.oliveira@adidas.com',   bday:{m:7, d:2},  name:'Vera Oliveira',   role:'Pure Heart',  bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'rahul.nagpal@adidas.com',    bday:{m:6, d:8},  name:'Rahul Nagpal',    role:'Generous Soul',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  { email:'surabhi.negi@adidas.com',    bday:{m:11,d:21}, name:'Surabhi Negi',    role:'Lost Soul', bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-];
-
-let team = [];
-
-// Show a small save status badge
-function showSaveStatus(msg, color) {
-  let badge = document.getElementById('save-status');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'save-status';
-    badge.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:100px;font-size:13px;font-weight:500;z-index:9999;transition:opacity 0.4s;font-family:DM Sans,sans-serif;';
-    document.body.appendChild(badge);
-  }
-  badge.textContent = msg;
-  badge.style.background = color;
-  badge.style.color = '#fff';
-  badge.style.opacity = '1';
-  clearTimeout(badge._hide);
-  badge._hide = setTimeout(() => badge.style.opacity = '0', 3000);
+// Load from localStorage or use defaults
+function defaultTeam() {
+  return [
+    { email:'ankit.parmar@adidas.com',    bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Data Engineer',       bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'arpita.doshatti@adidas.com', bday:{m:6, d:5},  name:'Arpita Doshatti', role:'Analytics Lead',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'ashish.kumar@adidas.com',    bday:{m:8, d:1},  name:'Ashish Kumar',    role:'Senior Analyst',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'jose.leitao@adidas.com',     bday:{m:2, d:16}, name:'Jose Leitao',     role:'Business Analyst',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'piyush.bansal@adidas.com',   bday:{m:6, d:8},  name:'Piyush Bansal',   role:'Data Scientist',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'vera.oliveira@adidas.com',   bday:{m:7, d:2},  name:'Vera Oliveira',   role:'Product Analyst',     bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'rahul.nagpal@adidas.com',    bday:{m:6, d:8},  name:'Rahul Nagpal',    role:'ML Engineer',         bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+    { email:'surabhi.negi@adidas.com',    bday:{m:11,d:21}, name:'Surabhi Negi',    role:'Insights Manager',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  ];
 }
 
-// Load team from GitHub data.json, fall back to localStorage, then defaults
-async function loadTeam() {
-  try {
-    const url = `https://raw.githubusercontent.com/${GH_REPO}/main/${GH_FILE}?t=${Date.now()}`;
-    const res  = await fetch(url);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        localStorage.setItem('adidas_team_hub', JSON.stringify(data));
-        return data;
-      }
-    }
-  } catch(e) { console.warn('GitHub load failed, trying localStorage', e); }
-  // Fallback: localStorage
+function loadTeam() {
   try {
     const saved = localStorage.getItem('adidas_team_hub');
     if (saved) return JSON.parse(saved);
-  } catch(e) {}
-  return JSON.parse(JSON.stringify(DEFAULT_TEAM)); // deep copy
+  } catch(e){}
+  return defaultTeam();
 }
 
-// Save team to GitHub data.json AND localStorage
-async function saveTeam() {
+function saveTeam() {
   localStorage.setItem('adidas_team_hub', JSON.stringify(team));
-  showSaveStatus('⏳ Saving...', '#888');
-  try {
-    const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
-    const headers = {
-      'Authorization': `token ${GH_TOKEN}`,
-      'Content-Type': 'application/json'
-    };
-
-    // Check if file already exists (need its SHA to update)
-    let sha = null;
-    const check = await fetch(apiBase, { headers });
-    if (check.ok) {
-      const info = await check.json();
-      sha = info.sha;
-    }
-
-    // Encode team data as base64
-    const json    = JSON.stringify(team, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(json)));
-
-    const body = {
-      message: `Update team data — ${new Date().toLocaleString()}`,
-      content: encoded,
-      ...(sha ? { sha } : {})
-    };
-
-    const put = await fetch(apiBase, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(body)
-    });
-
-    if (put.ok) {
-      showSaveStatus('✅ Saved for everyone!', '#1D9E75');
-    } else {
-      const err = await put.json();
-      console.error('GitHub save error:', err);
-      showSaveStatus('⚠️ Saved locally only', '#EF9F27');
-    }
-  } catch(e) {
-    console.error('Save failed:', e);
-    showSaveStatus('⚠️ Saved locally only', '#EF9F27');
-  }
 }
 
+let team = loadTeam();
 let isAdmin = false;
 let currentMemberIdx = null;
 let editHobbies = [];
 let editLikes = [];
-
-// ── BOOT — load data first, then render everything ───────────────────────────
-async function init() {
-  team = await loadTeam();
-  team.forEach((m, i) => { m.colorIdx = i % COLORS.length; });
-  bootApp();
-}
-init();
-
-function bootApp() {
 
 // ── HELPERS ─────────────────────────────────────────────────────────────────
 function initials(name) {
@@ -1175,8 +1088,6 @@ function buildTicker() {
 }
 buildTicker();
 
-} // end bootApp()
-
 // ── MEMBER MODAL ─────────────────────────────────────────────────────────────
 function openMember(idx) {
   currentMemberIdx = idx;
@@ -1203,7 +1114,7 @@ function openMember(idx) {
   // Info
   document.getElementById('modal-name').textContent = m.name;
   document.getElementById('modal-role').textContent = m.role;
-
+  
 
   // Birthday chip
   const chip = document.getElementById('modal-bday-chip');
@@ -1332,7 +1243,7 @@ function handlePhotoUpload(e) {
   reader.readAsDataURL(file);
 }
 
-async function saveProfile() {
+function saveProfile() {
   const m = team[currentMemberIdx];
   m.role     = document.getElementById('edit-role').value.trim() || m.role;
   m.bio      = document.getElementById('edit-bio').value.trim();
@@ -1341,7 +1252,7 @@ async function saveProfile() {
   m.likes    = [...editLikes];
   if (window._tempPhoto) { m.photo = window._tempPhoto; window._tempPhoto = null; }
 
-  await saveTeam();
+  saveTeam();
   renderOrbit();
 
   // Reload view
