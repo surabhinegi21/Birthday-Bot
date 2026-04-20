@@ -94,10 +94,12 @@
       "m": 7,
       "d": 2
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "Vera is simply wonderful, a genuinely kind human who treats everyone warmly, excels at what she does, and always carries a smile.",
+    "hobbies": [
+      "Family Time"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "Kindness, positivity, and good vibes all the way.",
     "photo": null,
     "colorIdx": 5,
     "isToday": false,
