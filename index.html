@@ -907,74 +907,125 @@ const COLORS = [
   { main:'#185FA5', light:'#E6F1FB' },
 ];
 
-// Load from localStorage or use defaults
-function defaultTeam() {
-  return [
-    { email:'ankit.parmar@adidas.com',    bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Mood Lifter',       bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'arpita.doshatti@adidas.com', bday:{m:6, d:5},  name:'Arpita Doshatti', role:'Festive Soul',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'ashish.kumar@adidas.com',    bday:{m:9, d:14}, name:'Ashish Kumar',    role:'The Charmer',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'jose.leitao@adidas.com',     bday:{m:2, d:16}, name:'Jose Leitao',     role:'Deep Thinker',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'piyush.bansal@adidas.com',   bday:{m:6, d:8},  name:'Piyush Bansal',   role:'Detail Master',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'vera.oliveira@adidas.com',   bday:{m:7, d:2},  name:'Vera Oliveira',   role:'Pure Heart',     bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'rahul.nagpal@adidas.com',    bday:{m:6, d:8},  name:'Rahul Nagpal',    role:'Gentle Soul',         bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-    { email:'surabhi.negi@adidas.com',    bday:{m:11,d:21}, name:'Surabhi Negi',    role:'Lost Soul',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
-  ];
+// ── GITHUB SYNC CONFIG ──────────────────────────────────────────────────────
+// Fill in your details below:
+const GH_TOKEN = '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';   // GitHub personal access token
+const GH_REPO  = 'surabhinegi21/Birthday-Bot'; // your GitHub repo
+const GH_FILE  = 'data.json';               // separate data file (not index.html)
+
+const DEFAULT_TEAM = [
+  { email:'ankit.parmar@adidas.com',    bday:{m:1, d:17}, name:'Ankit Parmar',    role:'Mood Lifter',    bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'arpita.doshatti@adidas.com', bday:{m:6, d:5},  name:'Arpita Doshatti', role:'Festive Soul',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'ashish.kumar@adidas.com',    bday:{m:9, d:14}, name:'Ashish Kumar',    role:'The Charmer',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'jose.leitao@adidas.com',     bday:{m:2, d:16}, name:'Jose Leitao',     role:'System Thinker', bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'piyush.bansal@adidas.com',   bday:{m:6, d:8},  name:'Piyush Bansal',   role:'Human Timeline',   bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'vera.oliveira@adidas.com',   bday:{m:7, d:2},  name:'Vera Oliveira',   role:'Pure Heart',  bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'rahul.nagpal@adidas.com',    bday:{m:6, d:8},  name:'Rahul Nagpal',    role:'Generous Soul',      bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+  { email:'surabhi.negi@adidas.com',    bday:{m:11,d:21}, name:'Surabhi Negi',    role:'Lost Soul', bio:'', hobbies:[], likes:[], funfact:'', photo:null },
+];
+
+let team = [];
+
+// Show a small save status badge
+function showSaveStatus(msg, color) {
+  let badge = document.getElementById('save-status');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'save-status';
+    badge.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:100px;font-size:13px;font-weight:500;z-index:9999;transition:opacity 0.4s;font-family:DM Sans,sans-serif;';
+    document.body.appendChild(badge);
+  }
+  badge.textContent = msg;
+  badge.style.background = color;
+  badge.style.color = '#fff';
+  badge.style.opacity = '1';
+  clearTimeout(badge._hide);
+  badge._hide = setTimeout(() => badge.style.opacity = '0', 3000);
 }
 
-function loadTeam() {
+// Load team from GitHub data.json, fall back to localStorage, then defaults
+async function loadTeam() {
+  try {
+    const url = `https://raw.githubusercontent.com/${GH_REPO}/main/${GH_FILE}?t=${Date.now()}`;
+    const res  = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        localStorage.setItem('adidas_team_hub', JSON.stringify(data));
+        return data;
+      }
+    }
+  } catch(e) { console.warn('GitHub load failed, trying localStorage', e); }
+  // Fallback: localStorage
   try {
     const saved = localStorage.getItem('adidas_team_hub');
     if (saved) return JSON.parse(saved);
-  } catch(e){}
-  return defaultTeam();
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_TEAM)); // deep copy
 }
 
+// Save team to GitHub data.json AND localStorage
 async function saveTeam() {
   localStorage.setItem('adidas_team_hub', JSON.stringify(team));
+  showSaveStatus('⏳ Saving...', '#888');
   try {
-    // Get current file SHA (required by GitHub API to update)
-    const meta = await fetch(
-      `https://api.github.com/repos/${GITHUB_REPO}/contents/index.html`,
-      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
-    );
-    const { sha, content } = await meta.json();
+    const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
+    const headers = {
+      'Authorization': `token ${GH_TOKEN}`,
+      'Content-Type': 'application/json'
+    };
 
-    // Decode current HTML, replace the defaultTeam() data block with updated team
-    const currentHTML = atob(content.replace(/\n/g,''));
-    const newTeamJSON = JSON.stringify(team, null, 4)
-      .replace(/\\/g,'\\\\').replace(/`/g,'\\`');
-    const updatedHTML = currentHTML.replace(
-      /function defaultTeam\(\)\s*\{[\s\S]*?return \[[\s\S]*?\];\s*\}/,
-      `function defaultTeam() {\n  return ${JSON.stringify(team, null, 4)};\n}`
-    );
+    // Check if file already exists (need its SHA to update)
+    let sha = null;
+    const check = await fetch(apiBase, { headers });
+    if (check.ok) {
+      const info = await check.json();
+      sha = info.sha;
+    }
 
-    // Push updated file back to GitHub
-    await fetch(
-      `https://api.github.com/repos/${GITHUB_REPO}/contents/index.html`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: 'Update team profile data',
-          content: btoa(unescape(encodeURIComponent(updatedHTML))),
-          sha
-        })
-      }
-    );
-    console.log('Saved to GitHub ✅');
+    // Encode team data as base64
+    const json    = JSON.stringify(team, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+
+    const body = {
+      message: `Update team data — ${new Date().toLocaleString()}`,
+      content: encoded,
+      ...(sha ? { sha } : {})
+    };
+
+    const put = await fetch(apiBase, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (put.ok) {
+      showSaveStatus('✅ Saved for everyone!', '#1D9E75');
+    } else {
+      const err = await put.json();
+      console.error('GitHub save error:', err);
+      showSaveStatus('⚠️ Saved locally only', '#EF9F27');
+    }
   } catch(e) {
-    console.error('GitHub save failed:', e);
+    console.error('Save failed:', e);
+    showSaveStatus('⚠️ Saved locally only', '#EF9F27');
   }
 }
 
-let team = loadTeam();
 let isAdmin = false;
 let currentMemberIdx = null;
 let editHobbies = [];
 let editLikes = [];
+
+// ── BOOT — load data first, then render everything ───────────────────────────
+async function init() {
+  team = await loadTeam();
+  team.forEach((m, i) => { m.colorIdx = i % COLORS.length; });
+  bootApp();
+}
+init();
+
+function bootApp() {
 
 // ── HELPERS ─────────────────────────────────────────────────────────────────
 function initials(name) {
@@ -1017,23 +1068,13 @@ team.forEach(m => {
 
 const bdayToday = team.filter(m => m.isToday);
 
+// For the centre star: today's birthday person, else whoever is next soonest
 // Use a COPY for sorting so original team array order (and colorIdx) stays intact
 const sortedByNext = [...team].sort((a, b) => a.daysUntil - b.daysUntil);
+const bdayStar     = bdayToday.length > 0 ? bdayToday[0] : sortedByNext[0];
 
-// bdayStars = all people whose birthday is today, else all tied for soonest next
-let bdayStars;
-if (bdayToday.length > 0) {
-  bdayStars = bdayToday;
-} else {
-  const soonestDays = sortedByNext[0].daysUntil;
-  bdayStars = sortedByNext.filter(m => m.daysUntil === soonestDays);
-}
-
-// Next birthday = soonest people NOT in bdayStars
-const nextDaysGroup = sortedByNext.filter(m => !bdayStars.find(s => s.name === m.name));
-const nextDays      = nextDaysGroup.length > 0 ? nextDaysGroup[0].daysUntil : null;
-const nextBdays     = nextDaysGroup.filter(m => m.daysUntil === nextDays);
-const nextBday      = nextBdays[0]; // keep for single-name references
+// Next birthday person (not the star)
+const nextBday = sortedByNext.find(m => !m.isToday && m.name !== bdayStar.name) || sortedByNext[1];
 
 // ── TOP BAR DATE ────────────────────────────────────────────────────────────
 document.getElementById('topbar-date').textContent = today.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
@@ -1045,8 +1086,7 @@ if (bdayToday.length > 0) {
   alertEl.textContent = `🎂 Happy Birthday, ${names}!`;
   launchConfetti();
 } else {
-  const nextNames = bdayStars.map(m => m.name.split(' ')[0]).join(' & ');
-  alertEl.textContent = `Next birthday: ${nextNames} in ${bdayStars[0].daysUntil} days`;
+  alertEl.textContent = `Next birthday: ${nextBday.name.split(' ')[0]} in ${nextBday.daysUntil} days`;
   document.querySelector('.bday-alert').style.background = '#F5F3EF';
   document.querySelector('.bday-alert').style.color = 'var(--muted)';
   document.querySelector('.bday-alert').style.border = '1px solid var(--border)';
@@ -1054,63 +1094,52 @@ if (bdayToday.length > 0) {
 }
 
 // ── STATS ───────────────────────────────────────────────────────────────────
-document.getElementById('stat-bday').textContent = bdayToday.length > 0 ? bdayToday.map(m => toFirstName(m.name)).join(' & ') : 'None today';
-document.getElementById('stat-next-name').textContent = nextBdays.map(m => toFirstName(m.name)).join(' & ');
-document.getElementById('stat-next-days').textContent = nextDays;
+document.getElementById('stat-bday').textContent = bdayToday.length > 0 ? toFirstName(bdayToday[0].name) : 'None today';
+document.getElementById('stat-next-name').textContent = toFirstName(nextBday.name);
+document.getElementById('stat-next-days').textContent = nextBday.daysUntil;
 
 // ── ORBIT ───────────────────────────────────────────────────────────────────
 function renderOrbit() {
   const wrap = document.getElementById('orbit-wrap');
-  [...wrap.querySelectorAll('.center-card,.sat')].forEach(el => el.remove());
+  // Remove existing cards (keep SVG ring)
+  [...wrap.querySelectorAll('.center-card,.sat')].forEach(el=>el.remove());
 
-  const starNames = new Set(bdayStars.map(m => m.name));
+  const starIdx = team.indexOf(team.find(m=>m.name===bdayStar.name)) || 0;
+  const c = COLORS[team[starIdx % team.length].colorIdx || 0];
 
-  // ── CENTRE STARS (1 or 2 people) ──
-  // If 2 stars, offset them left/right of true centre
-  bdayStars.forEach((starMember, si) => {
-    const centerEl = document.createElement('div');
-    centerEl.className = 'center-card';
+  // Center card
+  const centerEl = document.createElement('div');
+  centerEl.className = 'center-card';
+  centerEl.onclick = () => openMember(team.findIndex(m=>m.name===bdayStar.name));
 
-    // Horizontal offset: single = 0%, two = ±13%
-    const offsetX = bdayStars.length === 1 ? 0 : (si === 0 ? -13 : 13);
-    centerEl.style.position  = 'absolute';
-    centerEl.style.top       = '50%';
-    centerEl.style.left      = `calc(50% + ${offsetX}%)`;
-    centerEl.style.transform = 'translate(-50%, -50%)';
-    centerEl.style.zIndex    = '10';
-    centerEl.style.textAlign = 'center';
-    centerEl.style.cursor    = 'pointer';
+  const starMember = team.find(m=>m.name===bdayStar.name);
+  const starC = COLORS[starMember.colorIdx];
 
-    const starC = COLORS[starMember.colorIdx];
-    const avatarSize = bdayStars.length === 1 ? 108 : 88; // slightly smaller when two
-
-    centerEl.onclick = () => openMember(team.findIndex(m => m.name === starMember.name));
-    centerEl.innerHTML = `
-      <div class="center-avatar-wrap">
-        <span class="crown">👑</span>
-        <div class="center-avatar" style="width:${avatarSize}px;height:${avatarSize}px;background:${starC.light};color:${starC.main};border-color:${starC.main};">
-          ${starMember.photo ? `<img src="${starMember.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>` : initials(starMember.name)}
-        </div>
+  centerEl.innerHTML = `
+    <div class="center-avatar-wrap">
+      <span class="crown">👑</span>
+      <div class="center-avatar" style="background:${starC.light};color:${starC.main};border-color:${starC.main};">
+        ${starMember.photo ? `<img src="${starMember.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>` : initials(starMember.name)}
       </div>
-      <div class="center-name" style="font-size:${bdayStars.length === 1 ? 16 : 13}px;">${starMember.name}</div>
-      <div class="center-role">${starMember.role}</div>
-      <div class="bday-badge">${starMember.isToday ? '🎂 Birthday Today' : '⭐ Birthday Next'}</div>
-    `;
-    wrap.appendChild(centerEl);
-  });
+    </div>
+    <div class="center-name">${starMember.name}</div>
+    <div class="center-role">${starMember.role}</div>
+    <div class="bday-badge">${starMember.isToday ? '🎂 Birthday Today' : '⭐ Birthday Star'}</div>
+  `;
+  wrap.appendChild(centerEl);
 
-  // ── SATELLITES (everyone not in centre) ──
-  const others = team.filter(m => !starNames.has(m.name));
-  const radius = 38;
+  // Satellites
+  const others = team.filter(m=>m.name!==bdayStar.name);
+  const radius = 38; // % of container
   others.forEach((member, i) => {
-    const angle = (i / others.length) * 2 * Math.PI - Math.PI / 2;
+    const angle = (i / others.length) * 2 * Math.PI - Math.PI/2;
     const x = 50 + radius * Math.cos(angle);
     const y = 50 + radius * Math.sin(angle);
-    const mc  = COLORS[member.colorIdx];
+    const mc = COLORS[member.colorIdx];
     const idx = team.indexOf(member);
 
     const el = document.createElement('div');
-    el.className  = 'sat';
+    el.className = 'sat';
     el.style.left = x + '%';
     el.style.top  = y + '%';
     el.onclick = () => openMember(idx);
@@ -1129,11 +1158,9 @@ renderOrbit();
 // ── TICKER ──────────────────────────────────────────────────────────────────
 function buildTicker() {
   const track = document.getElementById('ticker-track');
-  const starLabel = bdayStars.map(m => m.name.split(' ')[0]).join(' & ');
-  const nextLabel = nextBdays.map(m => m.name.split(' ')[0]).join(' & ');
   const msgs = [
-    `${bdayToday.length > 0 ? '🎂' : '⭐'} ${starLabel}'s birthday — send them a cheer!`,
-    `🚀 Next up: ${nextLabel} in ${nextDays} days`,
+    `🎂 ${bdayStar.name}'s birthday — send them a cheer!`,
+    `🚀 Next up: ${nextBday.name.split(' ')[0]} in ${nextBday.daysUntil} days`,
     `💜 8 people · infinite ideas`,
     `☕ Shipping data-driven decisions daily`,
     `🌍 Adidas Analytics · stay curious`,
@@ -1147,6 +1174,8 @@ function buildTicker() {
   });
 }
 buildTicker();
+
+} // end bootApp()
 
 // ── MEMBER MODAL ─────────────────────────────────────────────────────────────
 function openMember(idx) {
@@ -1174,6 +1203,7 @@ function openMember(idx) {
   // Info
   document.getElementById('modal-name').textContent = m.name;
   document.getElementById('modal-role').textContent = m.role;
+  document.getElementById('modal-email').textContent = m.email;
 
   // Birthday chip
   const chip = document.getElementById('modal-bday-chip');
@@ -1302,7 +1332,7 @@ function handlePhotoUpload(e) {
   reader.readAsDataURL(file);
 }
 
-function saveProfile() {
+async function saveProfile() {
   const m = team[currentMemberIdx];
   m.role     = document.getElementById('edit-role').value.trim() || m.role;
   m.bio      = document.getElementById('edit-bio').value.trim();
@@ -1311,7 +1341,7 @@ function saveProfile() {
   m.likes    = [...editLikes];
   if (window._tempPhoto) { m.photo = window._tempPhoto; window._tempPhoto = null; }
 
-  saveTeam();
+  await saveTeam();
   renderOrbit();
 
   // Reload view
