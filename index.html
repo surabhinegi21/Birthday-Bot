@@ -929,8 +929,45 @@ function loadTeam() {
   return defaultTeam();
 }
 
-function saveTeam() {
+async function saveTeam() {
   localStorage.setItem('adidas_team_hub', JSON.stringify(team));
+  try {
+    // Get current file SHA (required by GitHub API to update)
+    const meta = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/index.html`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
+    );
+    const { sha, content } = await meta.json();
+
+    // Decode current HTML, replace the defaultTeam() data block with updated team
+    const currentHTML = atob(content.replace(/\n/g,''));
+    const newTeamJSON = JSON.stringify(team, null, 4)
+      .replace(/\\/g,'\\\\').replace(/`/g,'\\`');
+    const updatedHTML = currentHTML.replace(
+      /function defaultTeam\(\)\s*\{[\s\S]*?return \[[\s\S]*?\];\s*\}/,
+      `function defaultTeam() {\n  return ${JSON.stringify(team, null, 4)};\n}`
+    );
+
+    // Push updated file back to GitHub
+    await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/index.html`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Update team profile data',
+          content: btoa(unescape(encodeURIComponent(updatedHTML))),
+          sha
+        })
+      }
+    );
+    console.log('Saved to GitHub ✅');
+  } catch(e) {
+    console.error('GitHub save failed:', e);
+  }
 }
 
 let team = loadTeam();
