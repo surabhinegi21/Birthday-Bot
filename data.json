@@ -112,10 +112,12 @@
       "m": 6,
       "d": 8
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "Rahul is a book lover and an absolute sweetheart who enjoys meaningful conversations",
+    "hobbies": [
+      "Reading"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "Always there with kind words and the right vibe.",
     "photo": null,
     "colorIdx": 6,
     "isToday": false,
