@@ -76,10 +76,12 @@
       "m": 6,
       "d": 8
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "Piyush may look serious at first, but he’s actually super warm and easygoing. His mind works in perfect chronological order, forgets nothing, and he’s amazing at what he does.",
+    "hobbies": [
+      "Pool"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "literally remembers everything, like a human timeline 😄",
     "photo": null,
     "colorIdx": 4,
     "isToday": false,
