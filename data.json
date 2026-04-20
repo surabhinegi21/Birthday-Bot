@@ -6,10 +6,12 @@
       "m": 1,
       "d": 17
     },
-    "bio": "",
-    "hobbies": [],
+    "bio": "Ankit is the life of the party who loves making people smile and bringing great energy wherever he goes.",
+    "hobbies": [
+      "Chess"
+    ],
     "likes": [],
-    "funfact": "",
+    "funfact": "Effortlessly spreads joy and keeps the vibe upbeat.",
     "photo": null,
     "colorIdx": 0,
     "isToday": false,
